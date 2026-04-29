@@ -12,15 +12,23 @@ This is a full-stack web application for rating and managing movies with:
 - Python 3.7+ (for running the database population script)
 - A web browser
 - The Supabase database is already configured and accessible
+- Create a .env file with supabase keys
 
 ## Setup Instructions
 
 ### Step 1: Install Python Dependencies
 
-From the project directory, install the required Python packages:
+Create a virtual environment with:
+
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv venv
+```
+
+Then install the required Python packages:
+
+```bash
+pip3 install -r requirements.txt
 ```
 
 ### Step 2: Populate the Database (__already done__)
