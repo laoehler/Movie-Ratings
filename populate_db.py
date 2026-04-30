@@ -125,13 +125,13 @@ def populate_movies(csv_file_path):
                                             'genre_id': genre_id
                                         }).execute()
                                     except Exception as e:
-                                        print(f"  ⚠️  Error adding genre '{genre_name}' to movie: {e}")
+                                        print(f"Error adding genre '{genre_name}' to movie: {e}")
                     else:
                         print(f"Row {row_num}: Failed to add movie '{title}'")
                         errors_count += 1
 
                 except Exception as e:
-                    print(f"❌ Row {row_num}: Error processing row '{title}' - {e}")
+                    print(f"Row {row_num}: Error processing row '{title}' - {e}")
                     errors_count += 1
                     continue
 
