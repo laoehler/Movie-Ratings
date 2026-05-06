@@ -354,3 +354,107 @@ header h1 {
         margin: 30% auto;
     }
 }
+
+.genre-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.genre-label {
+    background: #f4f4f8;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.genre-label input {
+    margin-right: 6px;
+}
+
+.genre-header {
+    grid-column: 1 / -1;
+    margin-top: 20px;
+    color: #667eea;
+}
+
+.genre-group {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.app-nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.app-nav button {
+    padding: 8px 14px;
+    background-color: white;
+    color: #667eea;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.app-nav button:hover {
+    background-color: #f0f0f0;
+}
+
+.ratings-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.ratings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rating-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.rating-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+}
+
+.rating-card-header h3 {
+    margin: 0;
+}
+
+.user-rating-badge {
+    background: white;
+    color: #667eea;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.rating-card-body {
+    padding: 15px;
+}
+
+.rating-card-body p {
+    margin-bottom: 8px;
+    color: #555;
+}
