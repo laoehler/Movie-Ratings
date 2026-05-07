@@ -1,4 +1,3 @@
-// Initialize Supabase
 console.log('app.js is loading...');
 
 let supabaseClient = null;
@@ -10,15 +9,11 @@ async function initializeApp() {
     try {
         const response = await fetch('/api/config');
         const config = await response.json();
-        
-        // Initialize Supabase client with config from server
+
         supabaseClient = supabase.createClient(config.SUPABASE_URL, config.SUPABASE_PUBLISHABLE_KEY);
         console.log('Supabase client initialized');
-        
-        // Load genre filters
-        await loadGenres();
 
-        // Check auth status after client is ready
+        await loadGenres();
         checkAuthStatus();
     } catch (error) {
         console.error('Failed to initialize app:', error);
@@ -40,7 +35,6 @@ async function checkAuthStatus() {
 
 // Toggle between login and register forms
 function toggleForms() {
-    console.log('toggleForms function called');
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
@@ -50,7 +44,6 @@ function toggleForms() {
 // Handle Login
 document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     const messageDiv = document.getElementById('loginMessage');
@@ -58,12 +51,9 @@ document.getElementById('loginFormElement')?.addEventListener('submit', async (e
     try {
         const response = await fetch('/api/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-
         const result = await response.json();
 
         if (!response.ok) {
@@ -74,7 +64,6 @@ document.getElementById('loginFormElement')?.addEventListener('submit', async (e
 
         currentUser = result.user;
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
         messageDiv.textContent = 'Login successful!';
         messageDiv.className = 'message success';
 
@@ -82,7 +71,6 @@ document.getElementById('loginFormElement')?.addEventListener('submit', async (e
             showAppSection();
             loadMovies();
         }, 500);
-
     } catch (error) {
         messageDiv.textContent = 'Error logging in: ' + error.message;
         messageDiv.className = 'message error';
@@ -92,7 +80,6 @@ document.getElementById('loginFormElement')?.addEventListener('submit', async (e
 // Handle Registration
 document.getElementById('registerFormElement')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const username = document.getElementById('registerUsername').value;
     const password = document.getElementById('registerPassword').value;
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
@@ -107,12 +94,9 @@ document.getElementById('registerFormElement')?.addEventListener('submit', async
     try {
         const response = await fetch('/api/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
         });
-
         const result = await response.json();
 
         if (!response.ok) {
@@ -128,7 +112,6 @@ document.getElementById('registerFormElement')?.addEventListener('submit', async
             toggleForms();
             document.getElementById('registerFormElement').reset();
         }, 1500);
-
     } catch (error) {
         messageDiv.textContent = 'Error registering: ' + error.message;
         messageDiv.className = 'message error';
@@ -155,9 +138,47 @@ function showAppSection() {
     document.getElementById('authSection').style.display = 'none';
     document.getElementById('appSection').style.display = 'block';
     document.getElementById('currentUser').textContent = `Logged in as: ${currentUser.username}`;
-
     document.getElementById('moviesSection').style.display = 'block';
     document.getElementById('myRatingsSection').style.display = 'none';
+}
+
+// Nav button handlers
+document.getElementById('moviesPageBtn')?.addEventListener('click', () => {
+    console.log('Movies button clicked');
+    showMoviesPage();
+});
+
+document.getElementById('myRatingsPageBtn')?.addEventListener('click', () => {
+    console.log('My Ratings button clicked');
+    showMyRatingsPage();
+});
+
+function showMoviesPage() {
+    const moviesSection = document.getElementById('moviesSection');
+    const myRatingsSection = document.getElementById('myRatingsSection');
+
+    if (!moviesSection || !myRatingsSection) {
+        console.error('Missing moviesSection or myRatingsSection in index.html');
+        return;
+    }
+
+    moviesSection.style.display = 'block';
+    myRatingsSection.style.display = 'none';
+    loadMovies();
+}
+
+async function showMyRatingsPage() {
+    const moviesSection = document.getElementById('moviesSection');
+    const myRatingsSection = document.getElementById('myRatingsSection');
+
+    if (!moviesSection || !myRatingsSection) {
+        console.error('Missing moviesSection or myRatingsSection in index.html');
+        return;
+    }
+
+    moviesSection.style.display = 'none';
+    myRatingsSection.style.display = 'block';
+    await loadMyRatings();
 }
 
 // Render a list of movie objects into the moviesList div
@@ -165,13 +186,11 @@ function renderMovies(movies) {
     const moviesList = document.getElementById('moviesList');
     moviesList.innerHTML = '';
 
-    // Remove duplicate-looking movies
     const uniqueMovies = [];
     const seenMovies = new Set();
 
     movies.forEach(movie => {
         const key = `${movie.title}-${movie.release_year}-${movie.runtime_minutes}-${movie.imdb_rating}`;
-
         if (!seenMovies.has(key)) {
             seenMovies.add(key);
             uniqueMovies.push(movie);
@@ -184,9 +203,7 @@ function renderMovies(movies) {
     }
 
     uniqueMovies.forEach(movie => {
-        const genres = movie.movie_genres
-            ?.map(mg => mg.genres.genre_name)
-            .join(', ') || 'N/A';
+        const genres = movie.movie_genres?.map(mg => mg.genres.genre_name).join(', ') || 'N/A';
 
         const movieCard = document.createElement('div');
         movieCard.className = 'movie-card';
@@ -207,7 +224,8 @@ function renderMovies(movies) {
         moviesList.appendChild(movieCard);
     });
 }
-// Load ALL movies from database (no limit)
+
+// Load ALL movies from database
 async function loadMovies() {
     try {
         const { data, error } = await supabaseClient
@@ -226,7 +244,6 @@ async function loadMovies() {
     }
 }
 
-
 // Show movie detail modal
 async function showMovieDetail(movie) {
     const modal = document.getElementById('movieModal');
@@ -235,7 +252,7 @@ async function showMovieDetail(movie) {
 
     modalTitle.textContent = movie.title;
 
-    // Fetch user's rating if exists
+    // Fetch current user's rating
     let userRating = null;
     try {
         const { data } = await supabaseClient
@@ -244,18 +261,46 @@ async function showMovieDetail(movie) {
             .eq('user_id', currentUser.id)
             .eq('movie_id', movie.movie_id)
             .single();
-
         userRating = data;
     } catch (error) {
         // No rating exists yet
     }
 
+    // Fetch genres
     const genres = await supabaseClient
         .from('movie_genres')
         .select('genres(genre_name)')
         .eq('movie_id', movie.movie_id);
-
     const genreList = genres.data?.map(g => g.genres.genre_name).join(', ') || 'N/A';
+
+    // Fetch all community ratings with usernames
+    let allRatings = [];
+    try {
+        const { data: ratingsData, error: ratingsError } = await supabaseClient
+            .from('user_ratings')
+            .select('rating, description, users(username)')
+            .eq('movie_id', movie.movie_id)
+            .order('rating', { ascending: false });
+
+        if (!ratingsError && ratingsData) {
+            allRatings = ratingsData;
+        }
+    } catch (error) {
+        console.error('Error fetching community ratings:', error);
+    }
+
+    // Build ratings list HTML
+    const ratingsListHTML = allRatings.length > 0
+        ? allRatings.map((r, index) => {
+            const username = r.users?.username || 'Unknown';
+            return `
+                <button class="community-rating-btn" onclick="showRatingDetail(${index}, ${JSON.stringify(allRatings).replace(/"/g, '&quot;')})">
+                    <span class="community-rating-score">${r.rating}/10</span>
+                    <span class="community-rating-user">${username}</span>
+                </button>
+            `;
+        }).join('')
+        : '<p class="no-results">No community ratings yet.</p>';
 
     modalContent.innerHTML = `
         <div class="movie-detail">
@@ -282,6 +327,15 @@ async function showMovieDetail(movie) {
             <label for="userDescription">Your Review:</label>
             <textarea id="userDescription" placeholder="Write your review...">${userRating?.description || ''}</textarea>
         </div>
+
+        <div class="community-ratings-section">
+            <h3 class="community-ratings-title">Community Ratings</h3>
+            <div class="community-ratings-list">
+                ${ratingsListHTML}
+            </div>
+            <div id="ratingDetailView" class="rating-detail-view" style="display: none;"></div>
+        </div>
+
         <div class="btn-group">
             <button class="btn-cancel" onclick="closeMovieModal()">Close</button>
             <button class="btn-submit" onclick="saveUserRating('${movie.movie_id}')">Save Rating</button>
@@ -289,6 +343,36 @@ async function showMovieDetail(movie) {
     `;
 
     modal.style.display = 'block';
+}
+
+// Show an expanded rating detail inside the modal
+function showRatingDetail(index, ratingsJSON) {
+    const ratings = typeof ratingsJSON === 'string' ? JSON.parse(ratingsJSON) : ratingsJSON;
+    const r = ratings[index];
+    const username = r.users?.username || 'Unknown';
+    const detailView = document.getElementById('ratingDetailView');
+
+    // Deactivate previously active button
+    document.querySelectorAll('.community-rating-btn').forEach(btn => btn.classList.remove('active'));
+    const allBtns = document.querySelectorAll('.community-rating-btn');
+    if (allBtns[index]) allBtns[index].classList.add('active');
+
+    detailView.style.display = 'block';
+    detailView.innerHTML = `
+        <div class="rating-detail-header">
+            <span class="rating-detail-score">${r.rating}/10</span>
+            <span class="rating-detail-username">${username}</span>
+            <button class="rating-detail-close" onclick="closeRatingDetail()" title="Close">&times;</button>
+        </div>
+        <p class="rating-detail-text">${r.description || 'No review written.'}</p>
+    `;
+}
+
+// Close the expanded rating detail inside the modal
+function closeRatingDetail() {
+    const detailView = document.getElementById('ratingDetailView');
+    if (detailView) detailView.style.display = 'none';
+    document.querySelectorAll('.community-rating-btn').forEach(btn => btn.classList.remove('active'));
 }
 
 // Close movie modal
@@ -310,12 +394,7 @@ async function saveUserRating(movieId) {
         const { error } = await supabaseClient
             .from('user_ratings')
             .upsert(
-                {
-                    user_id: currentUser.id,
-                    movie_id: movieId,
-                    rating: rating,
-                    description: description
-                },
+                { user_id: currentUser.id, movie_id: movieId, rating, description },
                 { onConflict: 'user_id,movie_id' }
             );
 
@@ -332,14 +411,12 @@ async function saveUserRating(movieId) {
 }
 
 // Close modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     const modal = document.getElementById('movieModal');
     if (event.target == modal) {
         modal.style.display = 'none';
     }
-}
-
-// ...existing code...
+};
 
 // Load genres and render checkboxes for filtering
 async function loadGenres() {
@@ -357,28 +434,24 @@ async function loadGenres() {
         const container = document.getElementById('genreFilters');
         if (!container) return;
 
-        container.innerHTML = data.map(g => {
-            // use genre_name as the checkbox value to simplify client-side matching
-            return `<label class="genre-label"><input type="checkbox" value="${g.genre_name}" onchange="applyFilters()"> ${g.genre_name}</label>`;
-        }).join('') + `<button type="button" onclick="clearGenreFilters()">Clear</button>`;
+        container.innerHTML = data.map(g =>
+            `<label class="genre-label"><input type="checkbox" value="${g.genre_name}" onchange="applyFilters()"> ${g.genre_name}</label>`
+        ).join('') + `<button type="button" onclick="clearGenreFilters()">Clear</button>`;
     } catch (err) {
         console.error('Failed to load genres:', err);
     }
 }
 
 function clearGenreFilters() {
-    const checkboxes = document.querySelectorAll('#genreFilters input[type="checkbox"]');
-    checkboxes.forEach(cb => cb.checked = false);
+    document.querySelectorAll('#genreFilters input[type="checkbox"]').forEach(cb => cb.checked = false);
     applyFilters();
 }
 
 function applyFilters() {
     const query = document.getElementById('movieSearch')?.value || '';
-
     const selectedGenres = Array.from(
         document.querySelectorAll('#genreFilters input[type="checkbox"]:checked')
     ).map(cb => cb.value);
-
     searchMovies(query, selectedGenres);
 }
 
@@ -404,14 +477,10 @@ function searchMovies(query = '', selectedGenres = []) {
 
             if (selectedGenres.length > 0) {
                 filtered = filtered.filter(movie => {
-                    const movieGenres =
-                        movie.movie_genres
-                            ?.map(mg => mg.genres?.genre_name)
-                            .filter(Boolean) || [];
-
-                        return selectedGenres.every(selectedGenre =>
-                            movieGenres.includes(selectedGenre)
-                        );
+                    const movieGenres = movie.movie_genres
+                        ?.map(mg => mg.genres?.genre_name)
+                        .filter(Boolean) || [];
+                    return selectedGenres.every(g => movieGenres.includes(g));
                 });
             }
 
@@ -420,274 +489,80 @@ function searchMovies(query = '', selectedGenres = []) {
             console.error('Error searching movies:', error);
         }
     }, 300);
-
-    function showMoviesPage() {
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection in index.html');
-            return;
-        }
-    
-        moviesSection.style.display = 'block';
-        myRatingsSection.style.display = 'none';
-    
-        loadMovies();
-    }
-    
-    async function showMyRatingsPage() {
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection in index.html');
-            return;
-        }
-    
-        moviesSection.style.display = 'none';
-        myRatingsSection.style.display = 'block';
-    
-        await loadMyRatings();
-    }
-    
-    async function loadMyRatings() {
-        const ratingsList = document.getElementById('myRatingsList');
-        ratingsList.innerHTML = '';
-    
-        if (!currentUser) {
-            ratingsList.innerHTML = '<p class="no-results">Please log in to see your ratings.</p>';
-            return;
-        }
-    
-        try {
-            const { data, error } = await supabaseClient
-                .from('user_ratings')
-                .select(`
-                    rating,
-                    description,
-                    movies (
-                        movie_id,
-                        title,
-                        release_year,
-                        runtime_minutes,
-                        imdb_rating,
-                        movie_genres (
-                            genres (
-                                genre_name
-                            )
-                        )
-                    )
-                `)
-                .eq('user_id', currentUser.id)
-                .order('rating', { ascending: false });
-    
-            if (error) {
-                console.error('Error loading user ratings:', error);
-                ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
-                return;
-            }
-    
-            if (!data || data.length === 0) {
-                ratingsList.innerHTML = '<p class="no-results">You have not rated any movies yet.</p>';
-                return;
-            }
-    
-            data.forEach(item => {
-                const movie = item.movies;
-    
-                if (!movie) return;
-    
-                const genres = movie.movie_genres
-                    ?.map(mg => mg.genres?.genre_name)
-                    .filter(Boolean)
-                    .join(', ') || 'N/A';
-    
-                const ratingCard = document.createElement('div');
-                ratingCard.className = 'rating-card';
-    
-                ratingCard.innerHTML = `
-                    <div class="rating-card-header">
-                        <h3>${movie.title}</h3>
-                        <span class="user-rating-badge">Your Rating: ${item.rating}/10</span>
-                    </div>
-    
-                    <div class="rating-card-body">
-                        <p><strong>Year:</strong> ${movie.release_year || 'N/A'}</p>
-                        <p><strong>Runtime:</strong> ${movie.runtime_minutes || 'N/A'} min</p>
-                        <p><strong>Genres:</strong> ${genres}</p>
-                        <p><strong>IMDB:</strong> ${movie.imdb_rating || 'N/A'}/10</p>
-                        <p><strong>Your Review:</strong> ${item.description || 'No review written.'}</p>
-                    </div>
-                `;
-    
-                ratingsList.appendChild(ratingCard);
-            });
-    
-        } catch (error) {
-            console.error('Error loading my ratings:', error);
-            ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
-        }
-    }
-
-    window.showMoviesPage = function () {
-        console.log('Movies button clicked');
-    
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection in index.html');
-            return;
-        }
-    
-        moviesSection.style.display = 'block';
-        myRatingsSection.style.display = 'none';
-    
-        loadMovies();
-    };
-    
-    window.showMyRatingsPage = async function () {
-        console.log('My Ratings button clicked');
-    
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection in index.html');
-            return;
-        }
-    
-        moviesSection.style.display = 'none';
-        myRatingsSection.style.display = 'block';
-    
-        await loadMyRatings();
-    };
-    
-    async function loadMyRatings() {
-        console.log('Loading my ratings...');
-    
-        const ratingsList = document.getElementById('myRatingsList');
-        ratingsList.innerHTML = '';
-    
-        if (!currentUser) {
-            ratingsList.innerHTML = '<p class="no-results">Please log in to see your ratings.</p>';
-            return;
-        }
-    
-        try {
-            const { data, error } = await supabaseClient
-                .from('user_ratings')
-                .select(`
-                    rating,
-                    description,
-                    movies (
-                        movie_id,
-                        title,
-                        release_year,
-                        runtime_minutes,
-                        imdb_rating,
-                        movie_genres (
-                            genres (
-                                genre_name
-                            )
-                        )
-                    )
-                `)
-                .eq('user_id', currentUser.id)
-                .order('rating', { ascending: false });
-    
-            if (error) {
-                console.error('Error loading user ratings:', error);
-                ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
-                return;
-            }
-    
-            if (!data || data.length === 0) {
-                ratingsList.innerHTML = '<p class="no-results">You have not rated any movies yet.</p>';
-                return;
-            }
-    
-            data.forEach(item => {
-                const movie = item.movies;
-    
-                if (!movie) return;
-    
-                const genres = movie.movie_genres
-                    ?.map(mg => mg.genres?.genre_name)
-                    .filter(Boolean)
-                    .join(', ') || 'N/A';
-    
-                const ratingCard = document.createElement('div');
-                ratingCard.className = 'rating-card';
-    
-                ratingCard.innerHTML = `
-                    <div class="rating-card-header">
-                        <h3>${movie.title}</h3>
-                        <span class="user-rating-badge">Your Rating: ${item.rating}/10</span>
-                    </div>
-    
-                    <div class="rating-card-body">
-                        <p><strong>Year:</strong> ${movie.release_year || 'N/A'}</p>
-                        <p><strong>Runtime:</strong> ${movie.runtime_minutes || 'N/A'} min</p>
-                        <p><strong>Genres:</strong> ${genres}</p>
-                        <p><strong>IMDB:</strong> ${movie.imdb_rating || 'N/A'}/10</p>
-                        <p><strong>Your Review:</strong> ${item.description || 'No review written.'}</p>
-                    </div>
-                `;
-    
-                ratingsList.appendChild(ratingCard);
-            });
-    
-        } catch (error) {
-            console.error('Error loading my ratings:', error);
-            ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
-        }
-    }
-
-    window.showMyRatingsPage = function () {
-        console.log('My Ratings button clicked');
-        alert('My Ratings button works!');
-    };
-
-    document.getElementById('moviesPageBtn')?.addEventListener('click', () => {
-        console.log('Movies button clicked');
-        showMoviesPage();
-    });
-    
-    document.getElementById('myRatingsPageBtn')?.addEventListener('click', () => {
-        console.log('My Ratings button clicked');
-        showMyRatingsPage();
-    });
-    
-    function showMoviesPage() {
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection');
-            return;
-        }
-    
-        moviesSection.style.display = 'block';
-        myRatingsSection.style.display = 'none';
-    
-        loadMovies();
-    }
-    
-    async function showMyRatingsPage() {
-        const moviesSection = document.getElementById('moviesSection');
-        const myRatingsSection = document.getElementById('myRatingsSection');
-    
-        if (!moviesSection || !myRatingsSection) {
-            console.error('Missing moviesSection or myRatingsSection');
-            return;
-        }
-    
-        moviesSection.style.display = 'none';
-        myRatingsSection.style.display = 'block';
-    
-        await loadMyRatings();
-    }
 }
 
+// Load My Ratings page
+async function loadMyRatings() {
+    console.log('Loading my ratings...');
+    const ratingsList = document.getElementById('myRatingsList');
+    ratingsList.innerHTML = '';
+
+    if (!currentUser) {
+        ratingsList.innerHTML = '<p class="no-results">Please log in to see your ratings.</p>';
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('user_ratings')
+            .select(`
+                rating,
+                description,
+                movies (
+                    movie_id,
+                    title,
+                    release_year,
+                    runtime_minutes,
+                    imdb_rating,
+                    movie_genres (
+                        genres (
+                            genre_name
+                        )
+                    )
+                )
+            `)
+            .eq('user_id', currentUser.id)
+            .order('rating', { ascending: false });
+
+        if (error) {
+            console.error('Error loading user ratings:', error);
+            ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            ratingsList.innerHTML = '<p class="no-results">You have not rated any movies yet.</p>';
+            return;
+        }
+
+        data.forEach(item => {
+            const movie = item.movies;
+            if (!movie) return;
+
+            const genres = movie.movie_genres
+                ?.map(mg => mg.genres?.genre_name)
+                .filter(Boolean)
+                .join(', ') || 'N/A';
+
+            const ratingCard = document.createElement('div');
+            ratingCard.className = 'rating-card';
+            ratingCard.innerHTML = `
+                <div class="rating-card-header">
+                    <h3>${movie.title}</h3>
+                    <span class="user-rating-badge">Your Rating: ${item.rating}/10</span>
+                </div>
+                <div class="rating-card-body">
+                    <p><strong>Year:</strong> ${movie.release_year || 'N/A'}</p>
+                    <p><strong>Runtime:</strong> ${movie.runtime_minutes || 'N/A'} min</p>
+                    <p><strong>Genres:</strong> ${genres}</p>
+                    <p><strong>IMDB:</strong> ${movie.imdb_rating || 'N/A'}/10</p>
+                    <p><strong>Your Review:</strong> ${item.description || 'No review written.'}</p>
+                </div>
+            `;
+            ratingsList.appendChild(ratingCard);
+        });
+    } catch (error) {
+        console.error('Error loading my ratings:', error);
+        ratingsList.innerHTML = '<p class="no-results">Error loading your ratings.</p>';
+    }
+}

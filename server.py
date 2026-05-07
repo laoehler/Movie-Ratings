@@ -51,7 +51,7 @@ def register():
             return jsonify({'error': 'Username already exists'}), 409
 
         # Hash password before storing it
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
         response = (
             supabase
@@ -116,6 +116,13 @@ def login():
 def index():
     """Serve index.html"""
     return send_from_directory('.', 'index.html')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    """Handle favicon requests"""
+    from flask import Response
+    return Response(status=204)
 
 
 @app.route('/<path:path>')

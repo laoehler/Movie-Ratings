@@ -5,6 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Ratings</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Community Ratings List */
+        .community-ratings-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 1rem;
+        }
+
+        .community-ratings-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #333;
+        }
+
+        .community-ratings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .community-rating-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0.45rem 0.75rem;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+            width: 100%;
+        }
+
+        .community-rating-btn:hover {
+            background: #ebebeb;
+            border-color: #bbb;
+        }
+
+        .community-rating-btn.active {
+            background: #e8f0fe;
+            border-color: #4a7eff;
+        }
+
+        .community-rating-score {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            min-width: 3.5rem;
+        }
+
+        .community-rating-user {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        /* Rating Detail View */
+        .rating-detail-view {
+            margin-top: 1rem;
+            background: #fff;
+            border: 1px solid #c5d4f5;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+        }
+
+        .rating-detail-header {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .rating-detail-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            line-height: 1;
+            color: #888;
+            cursor: pointer;
+            padding: 0 0.2rem;
+        }
+
+        .rating-detail-close:hover {
+            color: #333;
+        }
+
+        .rating-detail-score {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            line-height: 1;
+        }
+
+        .rating-detail-username {
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .rating-detail-text {
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,7 +122,7 @@
         <div id="authSection" class="auth-section">
             <div class="auth-container">
                 <h1>Movie Ratings</h1>
-                
+
                 <!-- Login Form -->
                 <div id="loginForm" class="form-container">
                     <h2>Login</h2>
@@ -44,12 +154,12 @@
         <div id="appSection" class="app-section" style="display: none;">
             <header>
                 <h1>Movie Ratings</h1>
-            
+
                 <nav class="app-nav">
                     <button id="moviesPageBtn" type="button">Movies</button>
                     <button id="myRatingsPageBtn" type="button">My Ratings</button>
                 </nav>
-            
+
                 <div class="user-info">
                     <span id="currentUser"></span>
                     <button id="logoutBtn">Logout</button>
@@ -60,22 +170,21 @@
                 <!-- Movie List Section -->
                 <section id="moviesSection" class="movies-section">
                     <h2>Movies</h2>
-                    <input 
-                    type="text" 
-                    id="movieSearch" 
-                    placeholder="Search by title..." 
-                    oninput="applyFilters()"
-                >
-
-                <div id="genreFilters" class="genre-filters">
-                    <!-- Genre checkboxes will be loaded here -->
-                </div>
-
-                <div id="moviesList" class="movies-grid">
-                    <!-- Movies will be loaded here -->
-                </div>
+                    <input
+                        type="text"
+                        id="movieSearch"
+                        placeholder="Search by title..."
+                        oninput="applyFilters()"
+                    >
+                    <div id="genreFilters" class="genre-filters">
+                        <!-- Genre checkboxes will be loaded here -->
+                    </div>
+                    <div id="moviesList" class="movies-grid">
+                        <!-- Movies will be loaded here -->
+                    </div>
                 </section>
 
+                <!-- My Ratings Section -->
                 <section id="myRatingsSection" class="ratings-section" style="display: none;">
                     <h2>My Ratings</h2>
                     <div id="myRatingsList" class="ratings-list">
@@ -100,7 +209,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
     <script>
-        // Initialize app when DOM is ready
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
