@@ -225,7 +225,7 @@ function renderMovies(movies) {
     });
 }
 
-// Load ALL movies from database
+// Load movies from database
 async function loadMovies() {
     try {
         const { data, error } = await supabaseClient
